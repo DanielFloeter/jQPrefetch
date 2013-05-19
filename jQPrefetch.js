@@ -1,32 +1,27 @@
 /* *
 /*@@*
 *
-* @ name        SkinJS - Javascript Caching
-* @ description jQuery plugin for ajax interactions, browser object-mapping/-caching, prefetching/perloading
-* @ location    www.skinjs.de
+* @ name        jQPrefetch - Javascript Caching
+* @ description jQuery plugin for AJAX-interactions, browser object-mapping/-caching, prefetching/perloading
+* @ location    www.prefetchjs.de
 * @ license     GPL or MIT
-* @ version     0.9.2.3
-* @ date        December 10th, 2012
-* @ references  https://github.com/DanielFloeter/SkinJS/wiki/References
-* @ documentation https://github.com/DanielFloeter/SkinJS/wiki
-* @ repository  https://github.com/DanielFloeter/SkinJS
+* @ version     0.9.2.3.1
+* @ date        May 19th, 2013
+* @ references  https://github.com/DanielFloeter/jQPrefetch/wiki/References
+* @ documentation https://github.com/DanielFloeter/jQPrefetch/wiki
+* @ repository  https://github.com/DanielFloeter/jQPrefetch
 *
 /* *
 /*@@*/
 
 
 (function ($) {
-    $.fn.skin = function (settings) {
+    $.fn.jQPrefetch = function (settings) {
         settings = jQuery.extend({
-            // (string)
             ajaxAnchor: 'a',
-            // (string)
-            ajaxHref: 'href',
-            // (string, use a class and not a id) 
-            ajaxContainer: '.sknContainer',
-            // (string)
+            ajaxHref: 'href',            
+            ajaxContainer: '.sknContainer',  // use a class and not a id!
             exclude: '.donotpreload',
-            // (object)
             jContainer: $(this)
         }, settings);
 
