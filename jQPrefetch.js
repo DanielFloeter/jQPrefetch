@@ -5,11 +5,11 @@
 * @ description jQuery plugin for AJAX-interactions, browser object-mapping/-caching, prefetching/perloading
 * @ location    www.prefetchjs.de
 * @ license     GPL or MIT
-* @ version     0.9.2.3.1
+* @ version     0.9.2.3.2
 * @ date        May 19th, 2013
 * @ references  https://github.com/DanielFloeter/jQPrefetch/wiki/References
 * @ documentation https://github.com/DanielFloeter/jQPrefetch/wiki
-* @ repository  https://github.com/DanielFloeter/jQPrefetch 
+* @ repository  https://github.com/DanielFloeter/jQPrefetch
 *
 /* *
 /*@@*/
@@ -26,8 +26,8 @@
 
         config = {
             // localStorage and sessionStorage
-            supportsWebStorage: false
-        };
+            supportsWebStorage: false,            
+        };        
 
         // HTML cache         
         var cache = new Array();
@@ -131,7 +131,7 @@
 
             //$.get(strIdName + ".html", function (data) {            
             $.get(strIdName + ".html", function(){})
-            .done(function(data){
+            .done(function(data){                
                 
                 if ($(data).find(settings.ajaxContainer).parent().length == 0) {    // parent is body element                    
                     data = $(data).closest(settings.ajaxContainer).outerHTML();
@@ -169,6 +169,7 @@
                         nLoadedImgCount++;
                     });
 
+                    // TODO: as above, as own function
                     if(nLoadedImgCount > 0){
                         data.find('img').each(function(){
                             nLoadedImgCount--;
@@ -177,6 +178,7 @@
                     }else{ // html has no images
                         cache[nIndex]['$HTML'] = data;  // TODO: refactor, as own function, with array-cache and WebStorage
                     }
+
                     /*
                     data.find('img').on('load', function (e, data) {
                         nLoadedImgCount--;
@@ -237,12 +239,13 @@
         // switch page states
         function switchPageStates(strIdName) {
 
-            var classes = cache[cache.indexOf(strIdName)]['PreLoadState'];
+            var nIndex = cache.indexOf(strIdName); 
+            var classes = cache[nIndex]['PreLoadState'];
 
             if (classes.match(/Link/)) {
                 // TODO: refactor as hook
                 $('.progress').css('display', 'block');
-                cache[cache.indexOf(strIdName)]['PreLoadState'] = "loading";
+                cache[nIndex]['PreLoadState'] = "loading";
                 preload(strIdName, 'true');
             } else if (classes.match(/loading/)) {
                 // TODO: refactor as hook
@@ -270,13 +273,29 @@
                 settings.jContainer.replaceWith(strHtml);
                 */
 
-                cache[cache.indexOf(strIdName)]['$HTML'].find(settings.ajaxContainer).addClass(strIdName.toLowerCase());
-                settings.jContainer.replaceWith(cache[cache.indexOf(strIdName)]['$HTML'].html());
+                
+                var anfangszeit = new Date();
+                var startzeit = anfangszeit.getTime();
+                
+
+                var nIndex = cache.indexOf(strIdName); 
+                cache[nIndex]['$HTML'].find(settings.ajaxContainer).addClass(strIdName.toLowerCase());
+                settings.jContainer.replaceWith(cache[nIndex]['$HTML'].html());
+
+                
+                var Differenz;
+                var AktuellesmyForm = new Date();
+                var minuten = 0;
+                Differenz = (AktuellesmyForm.getTime() - startzeit);
+                console.log(Math.round (Differenz));
+                
             }         
             
             // init new Container
-            settings.jContainer = $(settings.ajaxContainer);
+            settings.jContainer = $(settings.ajaxContainer); // TODO: ? can be deleted ??
 
+            // TODO: START use only when needed ??
+            /*
             // user interaction
             $(settings.ajaxAnchor).not(settings.exclude).click(function (event) {
                 event.preventDefault();     // cancel the default action (navigation) of the click.
@@ -284,6 +303,11 @@
                 link = link[link.length - 1].split('.')[0];
                 switchPageStates(link.toLowerCase());
             });
+            */
+            // TODO: END use only when needed ??
+
+
+
 
             // Start:Additionals after content is loaded and displayed
 
