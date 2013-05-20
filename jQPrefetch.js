@@ -282,17 +282,13 @@
             // init new Container
             settings.jContainer = $(settings.ajaxContainer); // TODO: ? can be deleted ??
 
-            // TODO: START use only when needed ?? QDB #004
-            /*
             // user interaction
-            $(settings.ajaxAnchor).not(settings.exclude).click(function (event) {
+            settings.jContainer.find(settings.ajaxAnchor).not(settings.exclude).click(function (event) {
                 event.preventDefault();     // cancel the default action (navigation) of the click.
                 var link = $(this).attr(settings.ajaxHref).split('/');
                 link = link[link.length - 1].split('.')[0];
                 switchPageStates(link.toLowerCase());
             });
-            */
-            // TODO: END use only when needed ??
 
             // Start:Additionals after content is loaded and displayed
 
