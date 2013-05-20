@@ -9,7 +9,7 @@
 * @ date        May 19th, 2013
 * @ references  https://github.com/DanielFloeter/jQPrefetch/wiki/References
 * @ documentation https://github.com/DanielFloeter/jQPrefetch/wiki
-* @ repository  https://github.com/DanielFloeter/jQPrefetch
+* @ repository  https://github.com/DanielFloeter/jQPrefetch 
 *
 /* *
 /*@@*/
