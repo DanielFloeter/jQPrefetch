@@ -6,7 +6,7 @@
 * @ location    www.prefetchjs.de
 * @ license     GPL or MIT
 * @ version     0.9.2.3.2
-* @ date        May 19th, 2013
+* @ date        May 20th, 2013
 * @ references  https://github.com/DanielFloeter/jQPrefetch/wiki/References
 * @ documentation https://github.com/DanielFloeter/jQPrefetch/wiki
 * @ repository  https://github.com/DanielFloeter/jQPrefetch
@@ -190,6 +190,7 @@
                         }
                     });
                     */
+
                     data.find('img').error(function () {
                         nLoadedImgCount--;
                     })
@@ -273,28 +274,15 @@
                 settings.jContainer.replaceWith(strHtml);
                 */
 
-                
-                var anfangszeit = new Date();
-                var startzeit = anfangszeit.getTime();
-                
-
                 var nIndex = cache.indexOf(strIdName); 
                 cache[nIndex]['$HTML'].find(settings.ajaxContainer).addClass(strIdName.toLowerCase());
                 settings.jContainer.replaceWith(cache[nIndex]['$HTML'].html());
-
-                
-                var Differenz;
-                var AktuellesmyForm = new Date();
-                var minuten = 0;
-                Differenz = (AktuellesmyForm.getTime() - startzeit);
-                console.log(Math.round (Differenz));
-                
             }         
             
             // init new Container
             settings.jContainer = $(settings.ajaxContainer); // TODO: ? can be deleted ??
 
-            // TODO: START use only when needed ??
+            // TODO: START use only when needed ?? QDB #004
             /*
             // user interaction
             $(settings.ajaxAnchor).not(settings.exclude).click(function (event) {
@@ -305,9 +293,6 @@
             });
             */
             // TODO: END use only when needed ??
-
-
-
 
             // Start:Additionals after content is loaded and displayed
 
@@ -327,8 +312,6 @@
             // TODO: offer an additional hook ( -> Decision: As settings or public function?) for 'additionals'
         }
     };
-
-
         
     // extend Array object for the mapper    
     Array.prototype.append = function (index) {
