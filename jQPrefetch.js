@@ -204,11 +204,11 @@
         function loadImage(URL, data, nIndex) {
 
             var dataURL,
-                img;
-          
+                img;              
+                      
             img = new Image();
             img.src = URL;
-            img.onload = convetImgToDataUrl(img, data, nIndex);
+            img.onload = function(){ convetImgToDataUrl(img, data, nIndex); }            
         }
 
         // Tested with:
@@ -282,6 +282,8 @@
             // init new Container
             settings.jContainer = $(settings.ajaxContainer); // TODO: ? can be deleted ??
 
+            // TODO: START use only when needed ?? QDB #004
+            
             // user interaction
             settings.jContainer.find(settings.ajaxAnchor).not(settings.exclude).click(function (event) {
                 event.preventDefault();     // cancel the default action (navigation) of the click.
@@ -289,6 +291,8 @@
                 link = link[link.length - 1].split('.')[0];
                 switchPageStates(link.toLowerCase());
             });
+            
+            // TODO: END use only when needed ??
 
             // Start:Additionals after content is loaded and displayed
 
