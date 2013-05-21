@@ -6,7 +6,7 @@
 * @ location    www.prefetchjs.de
 * @ license     GPL or MIT
 * @ version     0.9.2.3.2
-* @ date        May 20th, 2013
+* @ date        May 21th, 2013
 * @ references  https://github.com/DanielFloeter/jQPrefetch/wiki/References
 * @ documentation https://github.com/DanielFloeter/jQPrefetch/wiki
 * @ repository  https://github.com/DanielFloeter/jQPrefetch
@@ -20,8 +20,7 @@
             ajaxAnchor: 'a',
             ajaxHref: 'href',            
             ajaxContainer: '.sknContainer',  // use a class and not a id!
-            exclude: '.donotpreload',
-            jContainer: $(this)
+            exclude: '.donotpreload'
         }, settings);
 
         config = {
@@ -204,11 +203,11 @@
         function loadImage(URL, data, nIndex) {
 
             var dataURL,
-                img;              
-                      
+                img;
+          
             img = new Image();
             img.src = URL;
-            img.onload = function(){ convetImgToDataUrl(img, data, nIndex); }            
+            img.onload = function(){ convetImgToDataUrl(img, data, nIndex); } 
         }
 
         // Tested with:
@@ -216,9 +215,12 @@
         // Mobile devices:  "Samsung Wave S8500", "Asus Nexus 7"            
         function convetImgToDataUrl(img, data, nIndex){
 
+            var anfangszeit=new Date();
+            var startzeit=anfangszeit.getTime();            
+
             canvas = document.createElement("canvas");
-            canvas.width =img.width;
-            canvas.height =img.height;
+            canvas.width = img.width;
+            canvas.height = img.height;
 
             var ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0);
@@ -235,6 +237,14 @@
             var aa = strHtml.replace($(img).attr('src'), dataURL);
             // localStorage[strIdName] = aa;
             cache[nIndex]['$HTML'] = $(aa).outerHTML();
+
+
+            var Differenz;
+            var dauer = new Date();
+            var endzeit = dauer.getTime();
+            Differenz = (endzeit - startzeit);
+            console.log("Convert- and Storezeit: " + Math.round (Differenz) + "ms");            
+
         };        
 
         // switch page states
@@ -264,35 +274,36 @@
             {
                 var strHtml = localStorage[strIdName];
                 $(strHtml).find(settings.ajaxContainer).addClass(strIdName.toLowerCase());
-                settings.jContainer.replaceWith(strHtml);
+                settings.ajaxContainer.replaceWith(strHtml);
             }
             else{
 
                 /*
                 var strHtml = cache[cache.indexOf(strIdName)]['$HTML'];
                 $(strHtml).find(settings.ajaxContainer).addClass(strIdName.toLowerCase());
-                settings.jContainer.replaceWith(strHtml);
+                settings.ajaxContainer.replaceWith(strHtml);
                 */
+
+                var anfangszeit=new Date();
+                var startzeit=anfangszeit.getTime();
 
                 var nIndex = cache.indexOf(strIdName); 
                 cache[nIndex]['$HTML'].find(settings.ajaxContainer).addClass(strIdName.toLowerCase());
-                settings.jContainer.replaceWith(cache[nIndex]['$HTML'].html());
+                $(settings.ajaxContainer).replaceWith(cache[nIndex]['$HTML'].html());
+
+                var Differenz;
+                var dauer = new Date();
+                var endzeit = dauer.getTime();
+                Differenz = (endzeit - startzeit);
+                console.log("Switchtime: " + Math.round (Differenz) + "ms");
             }         
             
-            // init new Container
-            settings.jContainer = $(settings.ajaxContainer); // TODO: ? can be deleted ??
-
-            // TODO: START use only when needed ?? QDB #004
-            
-            // user interaction
-            settings.jContainer.find(settings.ajaxAnchor).not(settings.exclude).click(function (event) {
+            $(settings.ajaxContainer).find(settings.ajaxAnchor).not(settings.exclude).click(function (event) {
                 event.preventDefault();     // cancel the default action (navigation) of the click.
                 var link = $(this).attr(settings.ajaxHref).split('/');
                 link = link[link.length - 1].split('.')[0];
                 switchPageStates(link.toLowerCase());
-            });
-            
-            // TODO: END use only when needed ??
+            });                
 
             // Start:Additionals after content is loaded and displayed
 
