@@ -1,114 +1,102 @@
-/* *
-/*@@*
-*
-* @ name        jQPrefetch - Javascript Caching
-* @ description jQuery plugin for AJAX-interactions, browser object-mapping/-caching, prefetching/perloading
-* @ location    www.prefetchjs.de
-* @ license     GPL or MIT
-* @ version     0.9.2.3.2
-* @ date        May 21th, 2013
-* @ references  https://github.com/DanielFloeter/jQPrefetch/wiki/References
-* @ documentation https://github.com/DanielFloeter/jQPrefetch/wiki
-* @ repository  https://github.com/DanielFloeter/jQPrefetch
-*
-/* *
-/*@@*/
+
+/**
+* Name jQPrefetch - Javascript Caching
+* A jQuery plugin for ajax interactions
+* Description AJAX-interactions, browser object-mapping/-caching, prefetching/perloading
+* Aproach The user should not intercepted with network circles and loading time
+* @filename jQPrefetch.js
+* @author Daniel Flöter  http://www.kometschuh.de
+* @version 0.9.2.3.4
+* @date 6th January 2014
+* @example Visit http://www.kometschuh.de/References.html
+* @demo http://www.prefetchjs.de/demopage/index.html
+* @documentation http://www.prefetchjs.de/
+* @GitHub https://github.com/DanielFloeter/jQPrefetch
+*/
 
 (function ($) {
+
     $.fn.jQPrefetch = function (settings) {
+        // Settings to configure the jQuery lightBox plugin how you like
         settings = jQuery.extend({
+            // (Html Element ettribute: string)
             ajaxAnchor: 'a',
-            ajaxHref: 'href',            
-            ajaxContainer: '.sknContainer',  // use a class and not a id!
-            exclude: '.donotpreload'
+            // (Html element attribute: string)
+            ajaxURL: 'href',
+            // (jQuery selector: string) 
+            // use a class and not a strId
+            // a parent element have to exist, which have no other elements inside (below) except ajaxContainers
+            ajaxContainer: '.container',
+            // (string)
+            currentContainer: document.location.href,
+            // (jQuery selector: string)
+            exclude: '.donotpreload',
+            // (nothing, .php, .html, .aspx, ...: string)
+            pageExtension: '.html'
         }, settings);
 
-        config = {
-            // localStorage and sessionStorage
-            supportsWebStorage: false,            
-        };        
+        var
+            IntervalRight,
+            States = ['Link', 'loading', 'preLoaded'];
 
-        // HTML cache         
+        // HTML cache
         var cache = new Array();
 
-        // first startpoint for preloading, starts after window is loaded
         $(window).on('load', function () {
-            // temporarly disabled: config.supportsWebStorage = (typeof(Storage) !=="undefined") ? true : false;
-            scanPages();
+            _findLoop();
         });
 
-        // handler after window.load
-        $(document).on('setActive', function () {
-            // user interaction
-            $(settings.ajaxAnchor).not(settings.exclude).click(function (event) {
-                event.preventDefault();     // cancel the default action (navigation) of the click.
-                var link = $(this).attr(settings.ajaxHref).split('/');
-                link = link[link.length - 1].split('.')[0];
-                switchPageStates(link.toLowerCase());
-            });
-        });
+        // fill array with all anchors
+        _findLoop = function ()
+        {
 
-        // setup for current page
-        function scanPages() {
-            // Start: add current page to array
+            // sign current #Content
             var location = document.location.href.split('/');
             location = location[location.length - 1].split('.')[0];
+
             if (location == '') { // if browser address www.domain.de/ and no index.html selected
                 location = 'index';
             }
+
+            $(settings.ajaxContainer).addClass(location.toLowerCase());
+            // sign current #Link
             var nIndex = cache.length;
-            cache.append(nIndex);
+            cache[nIndex];
+            cache.GetMultiArray(nIndex);
             cache[nIndex]['LinkName'] = location.toLowerCase();
             cache[nIndex]['PreLoadState'] = 'preLoaded';
 
-            // TODO: convert images with getDataURL()
+            _scanHTML();
 
-            if(config.supportsWebStorage)
-            {
-                localStorage[location.toLowerCase()] = $(settings.ajaxContainer).outerHTML().html();
-            }
-            else{
-                cache[nIndex]['$HTML'] = $(settings.ajaxContainer).outerHTML();
-            }            
-            
-            // TODO: rename Monitor-Trigger, e.g. iPreLoadedLinksMonitor
-            $(document).trigger('preLoadedLinks', location);
-            // End: add current page to array
-
-            // search for links in Html
-            scanHTML();
-
-            // set skin-click-event active, prevent default click-event
-            $(document).trigger('setActive');
-            // search for links in array
-            $(document).trigger('loadNext');
+            window.setTimeout(function () { _prelaolLoop(); }, 0);
         }
 
-        // fill array with all anchors
-        function scanHTML() {
-            $(settings.ajaxAnchor).not(settings.exclude).each(function () {
-                if ($(this).attr(settings.ajaxHref) != null) {
-                    var anchor = $(this).attr(settings.ajaxHref).split('/');
+        _scanHTML = function ()
+        {
+            $(settings.ajaxAnchor).not(settings.exclude).each(function ()
+            {
+                if ($(this).attr(settings.ajaxURL) != null)
+                {
+                    var anchor = $(this).attr(settings.ajaxURL).split('/');
                     anchor = anchor[anchor.length - 1].split('.')[0];
-                    if (!cache.contains(anchor)) {
+                    if (!cache.contains(anchor))
+                    {
                         var nIndex = cache.length;
-                        cache.append(nIndex);
+                        cache.GetMultiArray(nIndex);
                         cache[nIndex]['LinkName'] = anchor.toLowerCase();
                         cache[nIndex]['PreLoadState'] = 'Link';
-                        nIndex++;
                     }
                 }
             });
-        }
+        }        
 
-        $(document).on('loadNext', function () {
-            var nIndex = 0;
-            var load = 'true';
+        _prelaolLoop = function () {
+            var nIndex = 0,
+                load = 'true';
+
             do {
                 if (nIndex >= (cache.length)) {
                     load = 'false';
-                    // TODO: rename Monitor-Trigger, e.g. iAllPoadedLinksMonitor
-                    $(document).trigger('allPreLoaded');
                     break;
                 } else {
                     if (cache[nIndex]['PreLoadState'] == 'Link') {
@@ -118,243 +106,193 @@
                 }
                 nIndex++;
             } while (cache.length >= nIndex);
+
             if (load == 'true') {
-                preload(cache[nIndex]['LinkName']);
+                _prelaodContent(cache[nIndex]['LinkName']);
             }
-        });
+        }
 
-        function preload(strIdName, showAfterLoad) {
-            // TODO: use own prelaod-function and own loadedImgCount for comming from switchPageStates() with /Link/. loadedImgCount-counting is overlapping and can not trigger if loadedImgCount==0 correct
-            
-            var nLoadedImgCount = 0;            
+        _prelaodContent = function (strId, showAfterLoad)
+        {
+            var imgCounter = 0;
 
-            //$.get(strIdName + ".html", function (data) {            
-            $.get(strIdName + ".html", function(){})
-            .done(function(data){                
-                
-                if ($(data).find(settings.ajaxContainer).parent().length == 0) {    // parent is body element                    
-                    data = $(data).closest(settings.ajaxContainer).outerHTML();
-                } else {    // parent is not body element                    
-                    data = $(data).find(settings.ajaxContainer).outerHTML();
-                }
-
+            $("<div>").load(strId + ".html " + settings.ajaxContainer, function () {
                 var location = document.location.href.split('/');
                 location = location[location.length - 1].split('.')[0];
+
                 if (location == '') { // if browser address www.domain.de/ and no index.html selected
                     location = 'index';
                 }
 
-                // TODO: scanHTML();
-                var nIndex = cache.indexOf(strIdName);                
-                cache[nIndex]['PreLoadState'] = "preLoaded"; // not all images are loaded
+                $(this).find('img').each(function () {
+                    imgCounter++;
+                });
+                $(this).find('img').on('load', function () {
+                    imgCounter--;
+                    if (imgCounter == 0) {
 
-                /*
-                if(config.supportsWebStorage)
-                {
-                    localStorage[strIdName] = data.html();
-                }
-                else{
-                    cache[nIndex]['$HTML'] = data;
-                }
-                */
-
-                // TODO: rename Monitor-Trigger, e.g. iPreLoadedLinksMonitor
-                $(document).trigger('preLoadedLinks', strIdName);
-
-                if (showAfterLoad) {
-                    showPreLoaded(strIdName); // .ajax() is asynchronous: Show after load content
-                } else {
-                    data.find('img').each(function () {
-                        nLoadedImgCount++;
-                    });
-
-                    // TODO: as above, as own function
-                    if(nLoadedImgCount > 0){
-                        data.find('img').each(function(){
-                            nLoadedImgCount--;
-                            loadImage($(this).attr('src'), data, nIndex);                        
-                        });
-                    }else{ // html has no images
-                        cache[nIndex]['$HTML'] = data;  // TODO: refactor, as own function, with array-cache and WebStorage
-                    }
-
-                    /*
-                    data.find('img').on('load', function (e, data) {
-                        nLoadedImgCount--;
-
-                        convetImgToDataUrl(this, $(this).attr('src'));
-
-                        if (nLoadedImgCount == 0) {
-                            $(document).trigger('loadNext');
+                        if (showAfterLoad) { // .load() is asynchronous: Show after load content
+                            _showContent(strId);
                         }
-                    });
-                    */
 
-                    data.find('img').error(function () {
-                        nLoadedImgCount--;
-                    })
-                    if (nLoadedImgCount == 0) { // loadNext anyway, e.g when the loaded HTML has no images
-                        $(document).trigger('loadNext');
-                    };
-                }                    
+                        window.setTimeout(function () { _prelaolLoop(); }, 0);
+                    }
+                });
+                $(this).find('img').error(function () {
+                    imgCounter--;
+                })
+                if (imgCounter == 0) { // _prelaolLoop anyway if loaded this have no img
+                    window.setTimeout(function () { _prelaolLoop(); }, 0);
+                };
+                $( this ).find( settings.ajaxContainer ).addClass( strId.toLowerCase() );
+                $( '.' + location.toLowerCase() ).parent().append( $(this).html() );
+                $( "." + strId.toLowerCase() ).css( "display", "none" );
+                cache[ cache.indexOf( strId ) ][ 'PreLoadState' ] = "preLoaded";
+                _addClick( this, strId );
             });
         };
 
-        function loadImage(URL, data, nIndex) {
-
-            var dataURL,
-                img;
-          
-            img = new Image();
-            img.src = URL;
-            img.onload = function(){ convetImgToDataUrl(img, data, nIndex); } 
+        _addClick = function ( _this, strId ) {
+            $("." + strId.toLowerCase() + " " + settings.ajaxAnchor).not(settings.exclude).click(function () {
+                _Click(this);
+                return false;
+            });
         }
 
-        // Tested with:
-        // Win 7:           Chrome 26, IE 9, FF 21, Opera 12
-        // Mobile devices:  "Samsung Wave S8500", "Asus Nexus 7"            
-        function convetImgToDataUrl(img, data, nIndex){
+        _Click = function ( _this ) {
+            var link = $( _this ).attr(settings.ajaxURL).split('/');
+            link = link[link.length - 1].split('.')[0];
 
-            var anfangszeit=new Date();
-            var startzeit=anfangszeit.getTime();            
+            _tryShowContent(link.toLowerCase());
 
-            canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
+            history.pushState('', '', link + settings.pageExtension);
+        }
 
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0);
+        $(settings.ajaxAnchor).not(settings.exclude).on('click', function () {
+            _Click( this );
+            return false;
+        });
 
-            // dataURL = canvas.toDataURL("image/png");
-            dataURL = canvas.toDataURL();
+        window.onpopstate = function(event) {
+            if (window.history.state == null){ // page was loaded
+                return;
+            }
+            var link = document.location.href.split('/');
+            link = link[link.length - 1].split('.')[0];
 
-            var strHtml = cache[nIndex]['$HTML'];
-            if(strHtml == undefined)
-                strHtml = data.html();  // for first image
-            else
-                strHtml = strHtml.html();  // all other images, with replaced images before
+            _tryShowContent(link.toLowerCase());
+        };
 
-            var aa = strHtml.replace($(img).attr('src'), dataURL);
-            // localStorage[strIdName] = aa;
-            cache[nIndex]['$HTML'] = $(aa).outerHTML();
+        _getState = function (strId) {
+            var classes = cache[cache.indexOf(strId)]['PreLoadState'];
 
+            for (var state in States) {
+                var regexState = new RegExp( States[state] );
+                if (classes.match(regexState)) {
+                    return States[state];
+                }
+            }           
+        }
 
-            var Differenz;
-            var dauer = new Date();
-            var endzeit = dauer.getTime();
-            Differenz = (endzeit - startzeit);
-            console.log("Convert- and Storezeit: " + Math.round (Differenz) + "ms");            
-
-        };        
-
-        // switch page states
-        function switchPageStates(strIdName) {
-
-            var nIndex = cache.indexOf(strIdName); 
-            var classes = cache[nIndex]['PreLoadState'];
-
-            if (classes.match(/Link/)) {
-                // TODO: refactor as hook
-                $('.progress').css('display', 'block');
-                cache[nIndex]['PreLoadState'] = "loading";
-                preload(strIdName, 'true');
-            } else if (classes.match(/loading/)) {
-                // TODO: refactor as hook
-                $('.progress').css('display', 'block');
-                window.setTimeout(function () { switchPageStates(strIdName); }, 100);
-            } else if (classes.match(/preLoaded/)) {
-                showPreLoaded(strIdName);
+        _tryShowContent = function (strId) {
+            var state = _getState(strId);
+            switch( state ){
+                case States[0]:
+                    cache[cache.indexOf(strId)]['PreLoadState'] = "loading";
+                    _prelaodContent(strId, 'true');
+                    break;
+                case States[1]:
+                    window.setTimeout(function () {
+                        _tryShowContent(strId);
+                    }, 100);
+                    break;
+                case States[2]:
+                    _showContent(strId);
+                    break;
             }
         }
 
-        function showPreLoaded(strIdName) {
-            // TODO: refactor as hook
-            $('.progress').css('display', 'none');
-            if(config.supportsWebStorage)
-            {
-                var strHtml = localStorage[strIdName];
-                $(strHtml).find(settings.ajaxContainer).addClass(strIdName.toLowerCase());
-                settings.ajaxContainer.replaceWith(strHtml);
+        _showContent = function (strId) {
+            $(settings.ajaxContainer).css('display', 'none');
+            $("." + strId).css("display", "block");
+
+            /** Additionals: Do not use with other sites */
+            switch ( strId ) {
+                case 'sat-nam-rasayan':
+                case 'workshops-massage-kurse-gong-meditation':
+                case 'yoga-shakti-dance-nobember-2013':
+                case 'sat-nam-rasayan':
+                case 'kundalini-yogalehrerausbildung-stufe-1-infoabende':
+                case 'cleaning-the-subconcious':
+                case 'cleaning-the-subconcious-2014':
+                case 'erkenne-deine-wahre-bestimmung':
+                case 'hormonyoga-im-kundaliniyoga-2014':
+                    Slider.initialize();
+                    break;
+                case 'yoga-workshops-veranstaltungen':
+                case 'workshops':
+                    Slider.initialize();
+                    
+                    window.setTimeout(function() {
+                        $( '.Teaser' ).children( 'li' ).addClass( 'viewport' );
+                    }, 100);                    
+                    break; 
+                default:
+                    $( '.Teaser' ).children( 'li' ).removeClass( 'viewport' );
             }
-            else{
 
-                /*
-                var strHtml = cache[cache.indexOf(strIdName)]['$HTML'];
-                $(strHtml).find(settings.ajaxContainer).addClass(strIdName.toLowerCase());
-                settings.ajaxContainer.replaceWith(strHtml);
-                */
-
-                var anfangszeit=new Date();
-                var startzeit=anfangszeit.getTime();
-
-                var nIndex = cache.indexOf(strIdName); 
-                cache[nIndex]['$HTML'].find(settings.ajaxContainer).addClass(strIdName.toLowerCase());
-                $(settings.ajaxContainer).replaceWith(cache[nIndex]['$HTML'].html());
-
-                var Differenz;
-                var dauer = new Date();
-                var endzeit = dauer.getTime();
-                Differenz = (endzeit - startzeit);
-                console.log("Switchtime: " + Math.round (Differenz) + "ms");
-            }         
-            
-            $(settings.ajaxContainer).find(settings.ajaxAnchor).not(settings.exclude).click(function (event) {
-                event.preventDefault();     // cancel the default action (navigation) of the click.
-                var link = $(this).attr(settings.ajaxHref).split('/');
-                link = link[link.length - 1].split('.')[0];
-                switchPageStates(link.toLowerCase());
-            });                
-
-            // Start:Additionals after content is loaded and displayed
-
-            /*
-            ...
-            $('#menu a').removeClass('active');
-
-            if (strIdName == 'index') {
-                $('#menu a#index').addClass('active');
-
-            } 
-            ...
-            */
-
-            // End:Additionals after content is loaded and displayed
-
-            // TODO: offer an additional hook ( -> Decision: As settings or public function?) for 'additionals'
+            // openstreet map
+            if (strId == 'kontakt') {
+                if (!$('#map').is('.olMap')) {
+                    drawmap();
+                }
+            }
         }
     };
-        
-    // extend Array object for the mapper    
-    Array.prototype.append = function (index) {
+
+    // extend Array object for the cache
+    Array.prototype.GetMultiArray = function (index)
+    {
         this[index] = new Array();
-    }        
-    
-    Array.prototype.indexOf = function (name) {
-    for (var i = 0; i < this.length; i++) {
-            if (name.toLowerCase() == this[i]['LinkName']) {
+    }
+
+    Array.prototype.append = function (index)
+    {
+        this[index] = new Array();
+    }
+
+    Array.prototype.indexOf = function (name)
+    {
+        for (var i = 0; i < this.length; i++)
+        {
+            if (name.toLowerCase() == this[i]['LinkName'])
+            {
                 return i;
             }
         }
-    }        
-    
-    Array.prototype.contains = function (obj) {
+    }
+
+    Array.prototype.contains = function (obj)
+    {
         var i = this.length;
-        while (i--) {
-            if (this[i]) {
-                if (this[i]['LinkName'] === obj.toLowerCase()) {
+        while (i--)
+        {
+            if (this[i])
+            {
+                if (this[i]['LinkName'] === obj.toLowerCase())
+                {
                     return true;
                 }
             }
         }
         return false;
-    }    
-
-    // missing function in jQuery
-
-    $.fn.outerHTML = function () {
-
-        return $(this).clone().wrap('<div>').parent();
     }
 
 })(jQuery);
+
+
+
+
+
+
 
