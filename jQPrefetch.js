@@ -218,35 +218,12 @@
 
             /** Additionals: Do not use with other sites */
             switch ( strId ) {
-                case 'sat-nam-rasayan':
-                case 'workshops-massage-kurse-gong-meditation':
-                case 'yoga-shakti-dance-nobember-2013':
-                case 'sat-nam-rasayan':
-                case 'kundalini-yogalehrerausbildung-stufe-1-infoabende':
-                case 'cleaning-the-subconcious':
-                case 'cleaning-the-subconcious-2014':
-                case 'erkenne-deine-wahre-bestimmung':
-                case 'hormonyoga-im-kundaliniyoga-2014':
-                    Slider.initialize();
-                    break;
-                case 'yoga-workshops-veranstaltungen':
-                case 'workshops':
-                    Slider.initialize();
-                    
-                    window.setTimeout(function() {
-                        $( '.Teaser' ).children( 'li' ).addClass( 'viewport' );
-                    }, 100);                    
-                    break; 
+                case 'index':
+                case 'project':
+                case 'jobs':
                 default:
-                    $( '.Teaser' ).children( 'li' ).removeClass( 'viewport' );
             }
 
-            // openstreet map
-            if (strId == 'kontakt') {
-                if (!$('#map').is('.olMap')) {
-                    drawmap();
-                }
-            }
         }
     };
 
