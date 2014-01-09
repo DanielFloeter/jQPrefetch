@@ -28,7 +28,7 @@ The layout build has no flickering and is not disturbed.
 ##More Stuff: 
 [http://www.prefetchjs.de] (http://www.prefetchjs.de)
 
-##Who's use SkinJS:
+##Who's use jQPrefetch:
 [www.prefetchjs.de/demopage/index.html] (http://www.prefetchjs.de/demopage/index.html)
 
 [http://www.kometschuh.de/References.html] (http://www.kometschuh.de/References.html)
@@ -37,6 +37,6 @@ The layout build has no flickering and is not disturbed.
 
 This plugin is licensed under GPL or MIT License
 
-Copyright (c) 2012 [Daniel Floeter](http://kometschuh.de)
+Copyright (c) 2012-2014 [Daniel Floeter](http://kometschuh.de)
 
-Copyright retained for jQuery (c) 2012 [jQuery](http://jquery.com)
+Copyright retained for jQuery (c) 2014 [jQuery](http://jquery.com)
