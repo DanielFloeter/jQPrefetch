@@ -37,28 +37,26 @@
 
         var
             IntervalRight,
-            States = ['Link', 'loading', 'preLoaded'];
+            States = ['Link', 'loading', 'preLoaded'],
+            jAjaxContainerParent;
 
         // HTML cache
         var cache = new Array();
 
         $(window).on('load', function () {
-            _findLoop();
-        });
-
-        // fill array with all anchors
-        _findLoop = function ()
-        {
-
+            // fill array with all anchors
             // sign current #Content
             var location = document.location.href.split('/');
             location = location[location.length - 1].split('.')[0];
 
-            if (location == '') { // if browser address www.domain.de/ and no index.html selected
+            if (location == '')
+            { // if browser address www.domain.de/ and no index.html selected
                 location = 'index';
             }
 
             $(settings.ajaxContainer).addClass(location.toLowerCase());
+            jAjaxContainerParent = $('.' + location.toLowerCase()).parent();
+
             // sign current #Link
             var nIndex = cache.length;
             cache[nIndex];
@@ -66,12 +64,12 @@
             cache[nIndex]['LinkName'] = location.toLowerCase();
             cache[nIndex]['PreLoadState'] = 'preLoaded';
 
-            _scanHTML();
+            _scanHtmlLoop();
 
-            window.setTimeout(function () { _prelaolLoop(); }, 0);
-        }
+            window.setTimeout(function () { _warmUpCacheLoop(); }, 0);
+        });
 
-        _scanHTML = function ()
+        _scanHtmlLoop = function ()
         {
             $(settings.ajaxAnchor).not(settings.exclude).each(function ()
             {
@@ -90,7 +88,7 @@
             });
         }        
 
-        _prelaolLoop = function () {
+        _warmUpCacheLoop = function () {
             var nIndex = 0,
                 load = 'true';
 
@@ -135,19 +133,21 @@
                             _showContent(strId);
                         }
 
-                        window.setTimeout(function () { _prelaolLoop(); }, 0);
+                        window.setTimeout(function () { _warmUpCacheLoop(); }, 0);
                     }
                 });
                 $(this).find('img').error(function () {
                     imgCounter--;
                 })
-                if (imgCounter == 0) { // _prelaolLoop anyway if loaded this have no img
-                    window.setTimeout(function () { _prelaolLoop(); }, 0);
+                if (imgCounter == 0) { // _warmUpCacheLoop anyway if loaded this have no img
+                    window.setTimeout(function () { _warmUpCacheLoop(); }, 0);
                 };
-                $( this ).find( settings.ajaxContainer ).addClass( strId.toLowerCase() );
-                $( '.' + location.toLowerCase() ).parent().append( $(this).html() );
+                $(this).find(settings.ajaxContainer).addClass(strId.toLowerCase());
+                
+                jAjaxContainerParent.append($(this).html()); // append loaded Html
+
                 $( "." + strId.toLowerCase() ).css( "display", "none" );
-                cache[ cache.indexOf( strId ) ][ 'PreLoadState' ] = "preLoaded";
+                cache[cache.indexOf(strId)]['PreLoadState'] = "preLoaded";
                 _addClick( this, strId );
             });
         };
@@ -162,7 +162,6 @@
         _Click = function ( _this ) {
             var link = $( _this ).attr(settings.ajaxURL).split('/');
             link = link[link.length - 1].split('.')[0];
-
             _tryShowContent(link.toLowerCase());
 
             history.pushState('', '', link + settings.pageExtension);
@@ -221,9 +220,16 @@
                 case 'index':
                 case 'project':
                 case 'jobs':
+                    break;
                 default:
             }
 
+            // openstreet map
+            if (strId == 'kontakt') {
+                if (!$('#map').is('.olMap')) {
+                    drawmap();
+                }
+            }
         }
     };
 
