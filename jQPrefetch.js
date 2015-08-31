@@ -1,11 +1,10 @@
-
 /**
 * Name jQPrefetch - Javascript Caching
 * A jQuery plugin for ajax interactions
 * Description AJAX-interactions, browser object-mapping/-caching, prefetching/perloading
 * Aproach The user should not intercepted with network circles and loading time
 * @filename jQPrefetch.js
-* @author Daniel Flöter  http://www.kometschuh.de
+* @author Daniel FlÃ¶ter  http://www.kometschuh.de
 * @version 0.9.2.3.4
 * @date 6th January 2014
 * @example Visit http://www.kometschuh.de/References.html
@@ -41,7 +40,7 @@
             jAjaxContainerParent;
 
         // HTML cache
-        var cache = new Array();
+        var cache = new Array([]);
 
         $(window).on('load', function () {
             // fill array with all anchors
@@ -49,7 +48,7 @@
             var location = document.location.href.split('/');
             location = location[location.length - 1].split('.')[0];
 
-            if (location == '')
+            if (location === '')
             { // if browser address www.domain.de/ and no index.html selected
                 location = 'index';
             }
@@ -61,8 +60,8 @@
             var nIndex = cache.length;
             cache[nIndex];
             cache.GetMultiArray(nIndex);
-            cache[nIndex]['LinkName'] = location.toLowerCase();
-            cache[nIndex]['PreLoadState'] = 'preLoaded';
+            cache[nIndex]['Link.Name'] = location.toLowerCase();
+            cache[nIndex]['Pre.Load.State'] = 'preLoaded';
 
             _scanHtmlLoop();
 
@@ -73,7 +72,7 @@
         {
             $(settings.ajaxAnchor).not(settings.exclude).each(function ()
             {
-                if ($(this).attr(settings.ajaxURL) != null)
+                if ($(this).attr(settings.ajaxURL) !== null)
                 {
                     var anchor = $(this).attr(settings.ajaxURL).split('/');
                     anchor = anchor[anchor.length - 1].split('.')[0];
@@ -81,12 +80,12 @@
                     {
                         var nIndex = cache.length;
                         cache.GetMultiArray(nIndex);
-                        cache[nIndex]['LinkName'] = anchor.toLowerCase();
-                        cache[nIndex]['PreLoadState'] = 'Link';
+                        cache[nIndex]['Link.Name'] = anchor.toLowerCase();
+                        cache[nIndex]['Pre.Load.State'] = 'Link';
                     }
                 }
             });
-        }        
+        };        
 
         _warmUpCacheLoop = function () {
             var nIndex = 0,
@@ -97,8 +96,8 @@
                     load = 'false';
                     break;
                 } else {
-                    if (cache[nIndex]['PreLoadState'] == 'Link') {
-                        cache[nIndex]['PreLoadState'] = 'loading';
+                    if (cache[nIndex]['Pre.Load.State'] == 'Link') {
+                        cache[nIndex]['Pre.Load.State'] = 'loading';
                         break;
                     }
                 }
@@ -106,9 +105,9 @@
             } while (cache.length >= nIndex);
 
             if (load == 'true') {
-                _prelaodContent(cache[nIndex]['LinkName']);
+                _prelaodContent(cache[nIndex]['Link.Name']);
             }
-        }
+        };
 
         _prelaodContent = function (strId, showAfterLoad)
         {
@@ -118,7 +117,7 @@
                 var location = document.location.href.split('/');
                 location = location[location.length - 1].split('.')[0];
 
-                if (location == '') { // if browser address www.domain.de/ and no index.html selected
+                if (location === '') { // if browser address www.domain.de/ and no index.html selected
                     location = 'index';
                 }
 
@@ -127,7 +126,7 @@
                 });
                 $(this).find('img').on('load', function () {
                     imgCounter--;
-                    if (imgCounter == 0) {
+                    if (imgCounter === 0) {
 
                         if (showAfterLoad) { // .load() is asynchronous: Show after load content
                             _showContent(strId);
@@ -138,10 +137,10 @@
                 });
                 $(this).find('img').error(function () {
                     imgCounter--;
-                })
-                if (imgCounter == 0) { // _warmUpCacheLoop anyway if loaded this have no img
+                });
+                if (imgCounter === 0) { // _warmUpCacheLoop anyway if loaded this have no img
                     window.setTimeout(function () { _warmUpCacheLoop(); }, 0);
-                };
+                }
                 $(this).find(settings.ajaxContainer).addClass(strId.toLowerCase());
                 
                 jAjaxContainerParent.append($(this).html()); // append loaded Html
@@ -157,7 +156,7 @@
                 _Click(this);
                 return false;
             });
-        }
+        };
 
         _Click = function ( _this ) {
             var link = $( _this ).attr(settings.ajaxURL).split('/');
@@ -165,7 +164,7 @@
             _tryShowContent(link.toLowerCase());
 
             history.pushState('', '', link + settings.pageExtension);
-        }
+        };
 
         $(settings.ajaxAnchor).not(settings.exclude).on('click', function () {
             _Click( this );
@@ -173,7 +172,7 @@
         });
 
         window.onpopstate = function(event) {
-            if (window.history.state == null){ // page was loaded
+            if (window.history.state === null){ // page was loaded
                 return;
             }
             var link = document.location.href.split('/');
@@ -183,7 +182,7 @@
         };
 
         _getState = function (strId) {
-            var classes = cache[cache.indexOf(strId)]['PreLoadState'];
+            var classes = cache[cache.indexOf(strId)]['Pre.Load.State'];
 
             for (var state in States) {
                 var regexState = new RegExp( States[state] );
@@ -191,13 +190,13 @@
                     return States[state];
                 }
             }           
-        }
+        };
 
         _tryShowContent = function (strId) {
             var state = _getState(strId);
             switch( state ){
                 case States[0]:
-                    cache[cache.indexOf(strId)]['PreLoadState'] = "loading";
+                    cache[cache.indexOf(strId)]['Pre.Load.State'] = "loading";
                     _prelaodContent(strId, 'true');
                     break;
                 case States[1]:
@@ -209,7 +208,7 @@
                     _showContent(strId);
                     break;
             }
-        }
+        };
 
         _showContent = function (strId) {
             $(settings.ajaxContainer).css('display', 'none');
@@ -230,30 +229,30 @@
                     drawmap();
                 }
             }
-        }
+        };
     };
 
     // extend Array object for the cache
     Array.prototype.GetMultiArray = function (index)
     {
-        this[index] = new Array();
-    }
+        this[index] = new Array([]);
+    };
 
     Array.prototype.append = function (index)
     {
-        this[index] = new Array();
-    }
+        this[index] = new Array([]);
+    };
 
     Array.prototype.indexOf = function (name)
     {
         for (var i = 0; i < this.length; i++)
         {
-            if (name.toLowerCase() == this[i]['LinkName'])
+            if (name.toLowerCase() == this[i]['Link.Name'])
             {
                 return i;
             }
         }
-    }
+    };
 
     Array.prototype.contains = function (obj)
     {
@@ -262,20 +261,13 @@
         {
             if (this[i])
             {
-                if (this[i]['LinkName'] === obj.toLowerCase())
+                if (this[i]['Link.Name'] === obj.toLowerCase())
                 {
                     return true;
                 }
             }
         }
         return false;
-    }
+    };
 
 })(jQuery);
-
-
-
-
-
-
-
