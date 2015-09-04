@@ -33,7 +33,9 @@ The layout build has no flickering and is not disturbed.
 ##Who's use jQPrefetch:
 [www.prefetchjs.de/demopage/index.html] (http://www.prefetchjs.de/demopage/index.html)
 
-[http://www.kometschuh.de/References.html] (http://www.kometschuh.de/References.html)
+[http://www.physiomobil-ka.de/] (http://www.physiomobil-ka.de/)
+
+[http://www.oase-der-stille-karlsruhe.de/] (http://www.oase-der-stille-karlsruhe.de/)
 
 ##License
 
